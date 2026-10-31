@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Official Verified FAQs{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-patch-question text-teal me-2"></i> Frequently Asked Questions
+            </h2>
+            <p class="text-muted mb-0">
+                Official institutional answers verified by academic administrators and indexed in the AI knowledge base.
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{{ url_for('chat.chat_view') }}" class="btn btn-teal btn-sm">
+                <i class="bi bi-chat-quote-fill me-1"></i> Ask AI Assistant
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="card card-saas p-2 mb-4 border">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" id="faq-search" class="form-control border-0" placeholder="Search official FAQs (e.g. attendance, bonafide, library, fees, hostel)...">
+        </div>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <button class="btn btn-sm btn-outline-dark active faq-filter-btn" data-category="all">All FAQs ({{ faqs|length }})</button>
+        {% for cat in categories %}
+            <button class="btn btn-sm btn-outline-secondary faq-filter-btn" data-category="{{ cat }}">{{ cat }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- Accordion of FAQs -->
+    <div class="accordion" id="faqAccordion">
+        {% for f in faqs %}
+            <div class="accordion-item card card-saas mb-3 border-0 overflow-hidden shadow-sm faq-item" data-category="{{ f.category }}">
+                <h2 class="accordion-header" id="heading-{{ f.id }}">
+                    <button class="accordion-button collapsed fw-semibold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ f.id }}">
+                        <span class="badge bg-teal-subtle text-teal me-3">{{ f.category }}</span>
+                        {{ f.question }}
+                    </button>
+                </h2>
+                <div id="collapse-{{ f.id }}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body bg-light text-secondary pt-3 pb-3">
+                        <div class="mb-2 text-dark" style="line-height: 1.7;">{{ f.answer }}</div>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-muted small">
+                            <span><i class="bi bi-shield-check text-success me-1"></i> Verified Knowledge Base Entry</span>
+                            <span>{{ f.created_at }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-question-circle display-4 text-muted mb-3"></i>
+                <h5 class="text-muted">No verified FAQs registered yet.</h5>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.faq-filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.faq-filter-btn').forEach(b => b.classList.remove('active', 'btn-outline-dark'));
+        document.querySelectorAll('.faq-filter-btn').forEach(b => b.classList.add('btn-outline-secondary'));
+        this.classList.add('active', 'btn-outline-dark');
+        this.classList.remove('btn-outline-secondary');
+
+        const cat = this.getAttribute('data-category');
+        document.querySelectorAll('.faq-item').forEach(item => {
+            if (cat === 'all' || item.getAttribute('data-category') === cat) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+
+document.getElementById('faq-search').addEventListener('input', function() {
+    const term = this.value.toLowerCase().trim();
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const text = item.innerText.toLowerCase();
+        if (!term || text.includes(term)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

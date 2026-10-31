@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Console - Smart College Assistant AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Banner -->
+    <div class="card card-saas p-4 bg-navy text-white mb-4 border-0 shadow">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="badge bg-warning text-dark mb-2 px-3 py-1 rounded-pill">Administrator Master Console</div>
+                <h2 class="fw-bold text-white mb-1">Campus AI Operations Hub</h2>
+                <p class="text-white-50 mb-0">
+                    Oversee knowledge base indexing, document approvals, user permissions, and AI evaluation metrics.
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{{ url_for('admin.upload_document') }}" class="btn btn-teal btn-sm me-2">
+                    <i class="bi bi-cloud-arrow-up me-1"></i> Upload & Index
+                </a>
+                <a href="{{ url_for('admin.knowledge_base') }}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-database me-1"></i> Vector Index
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card card-saas p-3 border">
+                <div class="stat-badge bg-primary-subtle text-primary mb-2">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h4 class="fw-bold mb-0">{{ stats.total_users }}</h4>
+                <div class="text-muted small">Total Users ({{ stats.total_students }} Std / {{ stats.total_faculty }} Fac)</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card card-saas p-3 border">
+                <div class="stat-badge bg-success-subtle text-success mb-2">
+                    <i class="bi bi-file-earmark-check"></i>
+                </div>
+                <h4 class="fw-bold mb-0">{{ stats.approved_docs }}</h4>
+                <div class="text-muted small">Approved Documents</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card card-saas p-3 border">
+                <div class="stat-badge bg-warning-subtle text-warning mb-2">
+                    <i class="bi bi-hourglass-top"></i>
+                </div>
+                <h4 class="fw-bold mb-0">{{ stats.pending_docs }}</h4>
+                <div class="text-muted small">Pending Approvals</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card card-saas p-3 border">
+                <div class="stat-badge bg-teal-subtle text-teal mb-2">
+                    <i class="bi bi-cpu"></i>
+                </div>
+                <h4 class="fw-bold mb-0">{{ stats.vector_chunks }}</h4>
+                <div class="text-muted small">Vector Chunks in ChromaDB</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Fast-Action Quicklinks -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-2">
+            <a href="{{ url_for('admin.documents') }}" class="btn btn-light w-100 py-3 border text-dark fw-semibold text-center card-saas">
+                <i class="bi bi-file-earmark-ruled fs-4 text-primary d-block mb-1"></i> Documents
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('admin.knowledge_base') }}" class="btn btn-light w-100 py-3 border text-dark fw-semibold text-center card-saas">
+                <i class="bi bi-database-check fs-4 text-success d-block mb-1"></i> Knowledge Base
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('admin.faqs') }}" class="btn btn-light w-100 py-3 border text-dark fw-semibold text-center card-saas">
+                <i class="bi bi-patch-question fs-4 text-warning d-block mb-1"></i> FAQ Manager
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('admin.feedback') }}" class="btn btn-light w-100 py-3 border text-dark fw-semibold text-center card-saas">
+                <i class="bi bi-flag-fill fs-4 text-danger d-block mb-1"></i> Feedback Loop
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('admin.users') }}" class="btn btn-light w-100 py-3 border text-dark fw-semibold text-center card-saas">
+                <i class="bi bi-people-fill fs-4 text-info d-block mb-1"></i> User Roles
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('admin.evaluations') }}" class="btn btn-light w-100 py-3 border text-dark fw-semibold text-center card-saas">
+                <i class="bi bi-graph-up-arrow fs-4 text-teal d-block mb-1"></i> Evaluations
+            </a>
+        </div>
+    </div>
+
+    <!-- Two Column Section: Pending Approvals & Recent Audit Logs -->
+    <div class="row g-4">
+        <!-- Pending Approvals Queue -->
+        <div class="col-lg-6">
+            <div class="card card-saas p-4 h-100 border">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-hourglass-split text-warning me-2"></i> Documents Awaiting Review
+                    </h5>
+                    <a href="{{ url_for('admin.documents', status='PENDING') }}" class="small text-teal text-decoration-none">View All</a>
+                </div>
+
+                {% if pending_approvals %}
+                    <div class="list-group list-group-flush">
+                        {% for doc in pending_approvals %}
+                            <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1">{{ doc.title }}</h6>
+                                    <div class="text-muted small">
+                                        Submitted by {{ doc.uploader.full_name if doc.uploader else 'Faculty' }} &bull; {{ doc.file_type.upper() }}
+                                    </div>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <form method="POST" action="{{ url_for('admin.approve_document', doc_id=doc.id) }}" class="d-inline">
+                                        <button class="btn btn-success btn-sm me-1"><i class="bi bi-check-lg"></i> Approve & Index</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('admin.reject_document', doc_id=doc.id) }}" class="d-inline">
+                                        <button class="btn btn-outline-danger btn-sm"><i class="bi bi-x-lg"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-check-circle-fill text-success fs-3 mb-2"></i>
+                        <p class="small mb-0">All document submissions have been reviewed and indexed!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Audit Logs -->
+        <div class="col-lg-6">
+            <div class="card card-saas p-4 h-100 border">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-shield-lock text-primary me-2"></i> Security & Activity Audit
+                    </h5>
+                    <a href="{{ url_for('admin.audit_logs') }}" class="small text-teal text-decoration-none">Full Log</a>
+                </div>
+
+                <div class="list-group list-group-flush small">
+                    {% for log in recent_logs %}
+                        <div class="list-group-item px-0 py-2 border-bottom d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-light text-dark border me-1">{{ log.action }}</span>
+                                <span class="text-dark">{{ log.details or '' }}</span>
+                            </div>
+                            <span class="text-muted" style="font-size: 0.75rem;">{{ log.created_at.strftime('%H:%M:%S') }}</span>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4 text-muted">No logs recorded yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Smart College Assistant AI - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-gradient py-5 py-lg-6 position-relative">
+    <div class="hero-glow"></div>
+    <div class="container py-4">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-7 text-center text-lg-start">
+                <div class="badge bg-teal text-white mb-3 px-3 py-2 rounded-pill shadow-sm">
+                    <i class="bi bi-stars me-1"></i> Powered by Retrieval-Augmented Generation (RAG)
+                </div>
+                <h1 class="display-4 fw-extrabold text-white mb-3" style="letter-spacing: -1px; line-height: 1.15;">
+                    Your Smart Campus.<br>
+                    <span style="color: #2dd4bf;">One Intelligent Assistant.</span>
+                </h1>
+                <p class="lead text-white-50 mb-4" style="max-width: 580px;">
+                    Get instant access to college information through an intelligent AI assistant powered by RAG.
+                    Accurate, strictly grounded answers with verifiable source citations from official college handbooks and circulars.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('chat.chat_view') }}" class="btn btn-teal btn-lg px-4 shadow">
+                            <i class="bi bi-chat-quote-fill me-2"></i> Open AI Chatbot
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-teal btn-lg px-4 shadow">
+                            <i class="bi bi-rocket-takeoff me-2"></i> Get Started
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('main.sources') }}" class="btn btn-navy btn-lg px-4 border-secondary text-white">
+                        <i class="bi bi-folder-check me-2"></i> Explore Documents
+                    </a>
+                </div>
+
+                <!-- Live Metrics Bar -->
+                <div class="row mt-5 pt-3 border-top border-white-10 text-center text-lg-start">
+                    <div class="col-4">
+                        <h4 class="fw-bold text-white mb-0">{{ docs_count }}</h4>
+                        <div class="text-white-50 small">Approved Documents</div>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="fw-bold text-white mb-0">{{ faqs_count }}</h4>
+                        <div class="text-white-50 small">Verified FAQs</div>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="fw-bold text-teal mb-0">100%</h4>
+                        <div class="text-white-50 small">Grounded Citations</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Interactive Preview Card -->
+            <div class="col-lg-5">
+                <div class="card card-saas shadow-lg border-0 overflow-hidden">
+                    <div class="card-header bg-navy text-white d-flex align-items-center justify-content-between py-3 px-4">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-badge bg-teal text-white me-2" style="width: 32px; height: 32px; font-size: 14px;">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <span class="fw-semibold">Apex College AI Assistant</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success small">Online</span>
+                    </div>
+                    <div class="card-body p-4 bg-light">
+                        <!-- Simulated Conversation Preview -->
+                        <div class="d-flex justify-content-end mb-3">
+                            <div class="message-bubble message-user small py-2 px-3 shadow-sm">
+                                What are the attendance rules and condonation?
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-start mb-2">
+                            <div class="message-bubble message-assistant small py-2 px-3 shadow-sm bg-white border">
+                                <div class="fw-semibold text-teal mb-1"><i class="bi bi-check-circle-fill text-teal me-1"></i> Grounded College Answer:</div>
+                                <div>Students must maintain minimum <strong>75% attendance</strong>. Condonation between 65%-74% is granted only on approved medical grounds with a Rs. 1,500 fee.</div>
+                                <div class="source-citation-card mt-2 py-1 px-2">
+                                    <span class="badge bg-secondary me-1">Source</span>
+                                    <span class="text-dark fw-bold">Student Handbook</span> &bull; <span class="text-muted">Section 3 (Page 1)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white p-3 text-center border-top">
+                        <a href="{{ url_for('chat.chat_view') }}" class="btn btn-teal btn-sm w-100">
+                            Try Asking Real Questions <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<section class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="badge bg-teal-subtle text-teal px-3 py-2 rounded-pill fw-semibold mb-2">Campus Intelligence</span>
+            <h2 class="fw-bold text-dark">Comprehensive Academic Information Hub</h2>
+            <p class="text-muted" style="max-width: 600px; margin: 0 auto;">
+                Trained on authorized college handbooks, syllabi, fee circulars, and departmental notifications.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card card-saas h-100 p-4 border">
+                    <div class="stat-badge bg-primary-subtle text-primary mb-3">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Exams & Calendars</h5>
+                    <p class="text-muted small">
+                        Real-time schedules for Internal Assessments (IAT-1, IAT-2), Semester End Exams, practicals, and official holiday lists.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-saas h-100 p-4 border">
+                    <div class="stat-badge bg-success-subtle text-success mb-3">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Scholarships & Fees</h5>
+                    <p class="text-muted small">
+                        Clear guidance on Chairman's Merit Concessions, NSP, Post-Matric SC/ST grants, fee deadlines, and SBI Collect payment channels.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-saas h-100 p-4 border">
+                    <div class="stat-badge bg-info-subtle text-info mb-3">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Internships & Placements</h5>
+                    <p class="text-muted small">
+                        Step-by-step procedures for Internship NOC approval, 6-week industrial credits, Dream company policy, and placement criteria.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-saas h-100 p-4 border">
+                    <div class="stat-badge bg-warning-subtle text-warning mb-3">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Library & Digital Lab</h5>
+                    <p class="text-muted small">
+                        Book checkout quotas, extended examination hours, IEEE Xplore access, fine structures, and Koha OPAC online renewals.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-saas h-100 p-4 border">
+                    <div class="stat-badge bg-danger-subtle text-danger mb-3">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Hostel & Bus Routes</h5>
+                    <p class="text-muted small">
+                        Curfew timings (8:30 PM), meal schedules, room tariffs, day-out passes, and annual RFID bus pass renewal instructions.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-saas h-100 p-4 border">
+                    <div class="stat-badge bg-purple-subtle text-purple mb-3" style="background-color: #f3e8ff; color: #9333ea;">
+                        <i class="bi bi-file-earmark-medical"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Bonafide & Certificates</h5>
+                    <p class="text-muted small">
+                        Online portal turnaround times for bonafide certificates, official transcripts, bus concessions, and grade card verifications.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-light border-top border-bottom">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="badge bg-teal text-white px-3 py-2 rounded-pill fw-semibold mb-2">Workflow</span>
+            <h2 class="fw-bold text-dark">How The Assistant Answers You</h2>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="card card-saas p-4 h-100 border-0 shadow-sm">
+                    <div class="fw-bold text-teal display-6 mb-2">01</div>
+                    <h6 class="fw-bold">Student Query</h6>
+                    <p class="text-muted small mb-0">Ask any question in plain English via the responsive chat window.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-saas p-4 h-100 border-0 shadow-sm">
+                    <div class="fw-bold text-teal display-6 mb-2">02</div>
+                    <h6 class="fw-bold">Vector Search</h6>
+                    <p class="text-muted small mb-0">ChromaDB searches high-dimensional embeddings of approved documents.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-saas p-4 h-100 border-0 shadow-sm">
+                    <div class="fw-bold text-teal display-6 mb-2">03</div>
+                    <h6 class="fw-bold">Grounded Context</h6>
+                    <p class="text-muted small mb-0">Exact document snippets are retrieved and injected into the LLM prompt.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-saas p-4 h-100 border-0 shadow-sm">
+                    <div class="fw-bold text-teal display-6 mb-2">04</div>
+                    <h6 class="fw-bold">Cited Answer</h6>
+                    <p class="text-muted small mb-0">You receive a trustworthy response with clickable source citations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RAG Architecture Section -->
+<section class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-6">
+                <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-2">System Design</span>
+                <h2 class="fw-bold text-dark mb-3">Enterprise RAG Architecture</h2>
+                <p class="text-muted mb-4">
+                    Unlike standard generative chatbots that hallucinate policies, Smart College Assistant AI utilizes a strict Retrieval-Augmented Generation pipeline. Official college documents are parsed, chunked, and embedded into a high-performance vector store.
+                </p>
+                <ul class="list-unstyled">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-shield-check text-success fs-5 me-3"></i>
+                        <div>
+                            <strong>Hallucination Defense:</strong> The AI model is strictly prohibited from inventing college policies. If an answer is not in the knowledge base, it cleanly directs the student to the appropriate college office.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-arrow-repeat text-teal fs-5 me-3"></i>
+                        <div>
+                            <strong>Adaptive Feedback Loop:</strong> Students can report missing or incorrect answers. Administrators verify corrections and instantly index them as verified FAQs without retraining the foundation model.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-lock text-primary fs-5 me-3"></i>
+                        <div>
+                            <strong>Role-Based Access Control:</strong> Strict backend permission checks across Student, Faculty, and Administrator roles with session security.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <div class="card card-saas p-4 bg-navy text-white shadow-lg border-0">
+                    <h5 class="fw-bold text-white mb-3 d-flex align-items-center">
+                        <i class="bi bi-diagram-3-fill text-teal me-2"></i> RAG Pipeline Data Flow
+                    </h5>
+                    <div class="small p-3 rounded bg-dark border border-secondary font-monospace" style="line-height: 1.8;">
+                        <span class="text-info">[Student Query]</span><br>
+                        &nbsp;&nbsp;&nbsp;&darr; (Text Normalization)<br>
+                        <span class="text-teal">[Embedding Generator]</span> (all-MiniLM-L6-v2 ONNX)<br>
+                        &nbsp;&nbsp;&nbsp;&darr; (Cosine Similarity Search)<br>
+                        <span class="text-warning">[ChromaDB Vector Store]</span> (33+ Knowledge Chunks)<br>
+                        &nbsp;&nbsp;&nbsp;&darr; (Context Filtering & Source Attribution)<br>
+                        <span class="text-success">[Grounded Prompt + Google Gemini LLM]</span><br>
+                        &nbsp;&nbsp;&nbsp;&darr; (Anti-Hallucination & Citation Check)<br>
+                        <span class="text-white fw-bold">[Authoritative Answer with Page Citations]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technology Stack -->
+<section class="py-5 bg-light border-top">
+    <div class="container py-4 text-center">
+        <h4 class="fw-bold text-dark mb-4">Engineered With Leading Open-Source & AI Technologies</h4>
+        <div class="row g-3 justify-content-center">
+            <div class="col-6 col-md-2">
+                <div class="card card-saas p-3 border-0 bg-white">
+                    <i class="bi bi-filetype-py display-6 text-primary mb-2"></i>
+                    <h6 class="fw-bold mb-0">Python 3.13</h6>
+                    <span class="text-muted small">Flask & SQLAlchemy</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card card-saas p-3 border-0 bg-white">
+                    <i class="bi bi-database display-6 text-warning mb-2"></i>
+                    <h6 class="fw-bold mb-0">ChromaDB</h6>
+                    <span class="text-muted small">Vector Database</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card card-saas p-3 border-0 bg-white">
+                    <i class="bi bi-cpu display-6 text-teal mb-2"></i>
+                    <h6 class="fw-bold mb-0">Google Gemini</h6>
+                    <span class="text-muted small">Generative AI LLM</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card card-saas p-3 border-0 bg-white">
+                    <i class="bi bi-file-earmark-pdf display-6 text-danger mb-2"></i>
+                    <h6 class="fw-bold mb-0">PyMuPDF</h6>
+                    <span class="text-muted small">Document Extraction</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="card card-saas p-3 border-0 bg-white">
+                    <i class="bi bi-cloud-arrow-up display-6 text-info mb-2"></i>
+                    <h6 class="fw-bold mb-0">Render</h6>
+                    <span class="text-muted small">Production Hosting</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

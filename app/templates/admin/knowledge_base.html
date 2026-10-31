@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Knowledge Base & Vector Store - Admin Console{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-database text-teal me-2"></i> Knowledge Base & Vector Store Dashboard
+            </h2>
+            <p class="text-muted mb-0">Monitor ChromaDB persistent vector storage, test semantic retrieval, and trigger full re-indexing.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <form method="POST" action="{{ url_for('admin.reindex_all') }}" onsubmit="return confirm('Re-indexing will clear ChromaDB and rebuild all vector chunks from approved documents and verified FAQs. Proceed?');">
+                <button type="submit" class="btn btn-warning btn-sm">
+                    <i class="bi bi-arrow-repeat me-1"></i> Re-index All Documents & FAQs
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Vector Engine Diagnostics Card -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card card-saas p-3 border">
+                <div class="text-muted small">Total Vector Chunks</div>
+                <h3 class="fw-bold text-teal mb-0">{{ kb_stats.total_indexed_chunks }}</h3>
+                <div class="text-muted small mt-1">all-MiniLM-L6-v2 ONNX Model</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-saas p-3 border">
+                <div class="text-muted small">Active Approved Documents</div>
+                <h3 class="fw-bold text-dark mb-0">{{ approved_docs|length }}</h3>
+                <div class="text-muted small mt-1">Institutional Sources</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-saas p-3 border">
+                <div class="text-muted small">Verified FAQs in Vector DB</div>
+                <h3 class="fw-bold text-dark mb-0">{{ verified_faqs|length }}</h3>
+                <div class="text-muted small mt-1">Authoritative Chunks</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Semantic Retrieval Playground -->
+    <div class="card card-saas p-4 mb-4 border">
+        <h5 class="fw-bold text-dark mb-2">
+            <i class="bi bi-search text-teal me-2"></i> Semantic Retrieval Diagnostic Playground
+        </h5>
+        <p class="text-muted small mb-3">
+            Test how ChromaDB computes cosine distances and retrieves chunks for student questions without calling the external LLM.
+        </p>
+
+        <div class="input-group mb-3">
+            <input type="text" id="test-query-input" class="form-control" placeholder="Enter test query (e.g. When is the examination?, Library late fines, Bonafide certificate)...">
+            <button class="btn btn-teal" type="button" id="test-search-btn">
+                <i class="bi bi-lightning-charge me-1"></i> Test Retrieval
+            </button>
+        </div>
+
+        <!-- Diagnostic Results Container -->
+        <div id="test-results" class="d-none mt-3">
+            <h6 class="fw-bold text-secondary mb-2" id="results-count-label"></h6>
+            <div id="results-cards-container" class="d-flex flex-column gap-2"></div>
+        </div>
+    </div>
+
+    <!-- Active Ingested Sources Summary -->
+    <div class="card card-saas border">
+        <div class="card-header bg-white py-3 px-4">
+            <h5 class="fw-bold text-dark mb-0">Active Vector Knowledge Sources</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Document Title</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>File Size</th>
+                        <th>Active Chunks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in approved_docs %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-dark">{{ doc.title }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ doc.category }}</span></td>
+                            <td>{{ doc.file_type.upper() }}</td>
+                            <td>{{ doc.file_size_kb }} KB</td>
+                            <td><span class="badge bg-teal-subtle text-teal">{{ doc.chunk_count }} Chunks</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('test-search-btn').addEventListener('click', async function() {
+    const q = document.getElementById('test-query-input').value.trim();
+    if (!q) return;
+
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Searching...';
+
+    const formData = new FormData();
+    formData.append('query', q);
+
+    try {
+        const res = await fetch('/admin/knowledge-base/test-search', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        const container = document.getElementById('test-results');
+        const cardsDiv = document.getElementById('results-cards-container');
+        const label = document.getElementById('results-count-label');
+
+        cardsDiv.innerHTML = '';
+        container.classList.remove('d-none');
+        label.innerText = `Retrieved ${data.results_count} Most Relevant Chunks:`;
+
+        if (data.results && data.results.length > 0) {
+            data.results.forEach((r, idx) => {
+                const card = document.createElement('div');
+                card.className = 'p-3 bg-light rounded border';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold text-dark"><i class="bi bi-file-earmark-text text-teal me-1"></i> ${r.title} (Page ${r.page})</span>
+                        <div>
+                            <span class="badge bg-success-subtle text-success me-1">Similarity: ${r.similarity}%</span>
+                            <span class="badge bg-secondary-subtle text-secondary">Distance: ${r.distance ? r.distance.toFixed(4) : 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="small text-secondary mt-1 font-monospace" style="white-space: pre-wrap;">${r.text}</div>
+                `;
+                cardsDiv.appendChild(card);
+            });
+        } else {
+            cardsDiv.innerHTML = '<div class="alert alert-warning small mb-0">No matching chunks found above threshold.</div>';
+        }
+    } catch (e) {
+        alert('Diagnostic search error.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-lightning-charge me-1"></i> Test Retrieval';
+    }
+});
+</script>
+{% endblock %}

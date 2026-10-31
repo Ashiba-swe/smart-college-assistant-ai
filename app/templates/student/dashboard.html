@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Banner -->
+    <div class="card card-saas p-4 bg-navy text-white mb-4 border-0 shadow">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="badge bg-teal text-white mb-2 px-3 py-1 rounded-pill">Student Portal</div>
+                <h2 class="fw-bold text-white mb-1">Hello, {{ current_user.full_name }}</h2>
+                <p class="text-white-50 mb-0">
+                    {{ current_user.department }} &bull; Roll No: {{ current_user.roll_number or 'N/A' }}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{{ url_for('chat.chat_view') }}" class="btn btn-teal btn-lg px-4 shadow-sm">
+                    <i class="bi bi-chat-quote-fill me-2"></i> Launch Assistant
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card card-saas p-3 border">
+                <div class="d-flex align-items-center">
+                    <div class="stat-badge bg-primary-subtle text-primary me-3">
+                        <i class="bi bi-chat-dots"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ total_convs }}</h4>
+                        <div class="text-muted small">My Consultations</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-saas p-3 border">
+                <div class="d-flex align-items-center">
+                    <div class="stat-badge bg-success-subtle text-success me-3">
+                        <i class="bi bi-file-earmark-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ total_approved_docs }}</h4>
+                        <div class="text-muted small">Campus Handbooks</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-saas p-3 border">
+                <div class="d-flex align-items-center">
+                    <div class="stat-badge bg-warning-subtle text-warning me-3">
+                        <i class="bi bi-patch-question"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ total_faqs }}</h4>
+                        <div class="text-muted small">Verified FAQs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-saas p-3 border">
+                <div class="d-flex align-items-center">
+                    <div class="stat-badge bg-teal-subtle text-teal me-3">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ feedback_count }}</h4>
+                        <div class="text-muted small">Feedbacks Shared</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommended Topics & Recent History -->
+    <div class="row g-4">
+        <!-- Left: Quick Questions -->
+        <div class="col-lg-6">
+            <div class="card card-saas p-4 h-100 border">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-lightbulb text-warning me-2"></i> Quick Inquiries</h5>
+                <p class="text-muted small mb-3">Click on any frequent question to immediately ask the AI assistant:</p>
+                
+                <div class="d-flex flex-column gap-2">
+                    <a href="{{ url_for('chat.chat_view') }}" class="p-3 bg-light rounded text-decoration-none text-dark border d-flex justify-content-between align-items-center hover-shadow">
+                        <div>
+                            <span class="badge bg-secondary me-2">Exams</span>
+                            <span class="small fw-semibold">When are the upcoming semester examinations?</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-teal"></i>
+                    </a>
+                    <a href="{{ url_for('chat.chat_view') }}" class="p-3 bg-light rounded text-decoration-none text-dark border d-flex justify-content-between align-items-center hover-shadow">
+                        <div>
+                            <span class="badge bg-secondary me-2">Attendance</span>
+                            <span class="small fw-semibold">What is the medical condonation attendance rule?</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-teal"></i>
+                    </a>
+                    <a href="{{ url_for('chat.chat_view') }}" class="p-3 bg-light rounded text-decoration-none text-dark border d-flex justify-content-between align-items-center hover-shadow">
+                        <div>
+                            <span class="badge bg-secondary me-2">Bonafide</span>
+                            <span class="small fw-semibold">How do I apply for an urgent Bonafide Certificate?</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-teal"></i>
+                    </a>
+                    <a href="{{ url_for('chat.chat_view') }}" class="p-3 bg-light rounded text-decoration-none text-dark border d-flex justify-content-between align-items-center hover-shadow">
+                        <div>
+                            <span class="badge bg-secondary me-2">Internships</span>
+                            <span class="small fw-semibold">What is the eligibility for full semester 8th sem internship?</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-teal"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Recent Consultations -->
+        <div class="col-lg-6">
+            <div class="card card-saas p-4 h-100 border">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history text-teal me-2"></i> Recent Consultations</h5>
+                    <a href="{{ url_for('student.history') }}" class="small text-teal text-decoration-none fw-semibold">View All</a>
+                </div>
+
+                {% if recent_convs %}
+                    <div class="list-group list-group-flush">
+                        {% for conv in recent_convs %}
+                            <a href="{{ url_for('chat.chat_view', conversation_id=conv.id) }}" class="list-group-item list-group-item-action py-3 px-2 border-bottom">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 text-dark fw-semibold"><i class="bi bi-chat-left-text me-2 text-muted"></i>{{ conv.title }}</h6>
+                                    <small class="text-muted">{{ conv.updated_at.strftime('%b %d') }}</small>
+                                </div>
+                                <small class="text-muted">{{ conv.messages|length }} messages in this thread</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-chat-square-text text-muted display-6 mb-2"></i>
+                        <p class="text-muted small">No previous chats. Start your first consultation with the AI assistant!</p>
+                        <a href="{{ url_for('chat.chat_view') }}" class="btn btn-teal btn-sm">Start Consultation</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

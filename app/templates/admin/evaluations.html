@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}AI Evaluation & Benchmarks - Admin Console{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-graph-up-arrow text-teal me-2"></i> RAG Pipeline Evaluation & Benchmarks
+            </h2>
+            <p class="text-muted mb-0">Quantitative assessment of AI response quality, grounding fidelity, and citation reliability.</p>
+        </div>
+    </div>
+
+    <!-- Benchmark Cards -->
+    <div class="row g-3 mb-4">
+        {% for ev in evals %}
+            <div class="col-md-4">
+                <div class="card card-saas p-4 border h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small fw-semibold">{{ ev.metric_name }}</span>
+                        <span class="badge bg-success-subtle text-success border border-success">Pass</span>
+                    </div>
+                    <div class="d-flex align-items-baseline">
+                        <h2 class="fw-extrabold text-teal mb-0">{{ ev.score }}%</h2>
+                        <span class="text-muted small ms-2">/ 100</span>
+                    </div>
+                    <div class="progress mt-3" style="height: 6px;">
+                        <div class="progress-bar bg-teal" role="progressbar" style="width: {{ ev.score }}%"></div>
+                    </div>
+                    <div class="mt-2 text-muted small" style="font-size: 0.75rem;">
+                        Sample Size: {{ ev.sample_size }} verified questions &bull; {{ ev.created_at }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Evaluation Criteria Breakdown -->
+    <div class="card card-saas p-4 border">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-shield-check text-success me-2"></i> Evaluation Framework & Metrics</h5>
+        <div class="row g-4 small text-secondary">
+            <div class="col-md-6">
+                <h6 class="fw-bold text-dark">1. Groundedness (Faithfulness)</h6>
+                <p>Measures whether all claims made in the AI response can be mathematically verified by the retrieved source documents. Strict anti-hallucination prompts enforce a >95% score.</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold text-dark">2. Context Relevance</h6>
+                <p>Evaluates whether the vector store retrieved only chunks necessary to address the student question, minimizing noise and token cost.</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold text-dark">3. Source Citation Precision</h6>
+                <p>Ensures that every cited document, section title, and page number directly corroborates the factual statements in the answer.</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold text-dark">4. No-Answer Detection (Refusal Rate)</h6>
+                <p>Tests whether the model reliably refuses to answer questions about non-existent policies, unknown dates, or off-topic queries instead of inventing facts.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

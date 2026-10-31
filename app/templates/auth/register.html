@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - Smart College Assistant AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card card-saas p-4 p-md-5 border">
+                <div class="text-center mb-4">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo" width="48" height="48" class="mb-2">
+                    <h3 class="fw-bold text-dark">Create Your Account</h3>
+                    <p class="text-muted small">Register to consult the college AI knowledge base</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">Full Name *</label>
+                            <input type="text" name="full_name" class="form-control" placeholder="Ashiba K" required autofocus>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Username *</label>
+                            <input type="text" name="username" class="form-control" placeholder="ashiba22" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Email Address *</label>
+                            <input type="email" name="email" class="form-control" placeholder="ashiba@apextech.edu" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Role *</label>
+                            <select name="role" class="form-select" required>
+                                <option value="STUDENT" selected>Student</option>
+                                <option value="FACULTY">Faculty Member</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Roll / Faculty ID</label>
+                            <input type="text" name="roll_number" class="form-control" placeholder="e.g. 22IT045">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">Department</label>
+                            <select name="department" class="form-select">
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                                <option value="Electronics & Communication">Electronics & Communication</option>
+                                <option value="Electrical & Electronics">Electrical & Electronics</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                                <option value="Artificial Intelligence & Data Science">AI & Data Science</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Password *</label>
+                            <input type="password" name="password" class="form-control" placeholder="Min 6 characters" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Confirm Password *</label>
+                            <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-teal w-100 py-2 mb-3 shadow-sm">
+                        <i class="bi bi-person-check me-1"></i> Register Account
+                    </button>
+                </form>
+
+                <div class="text-center pt-2 border-top">
+                    <p class="small text-muted mb-0">Already registered? <a href="{{ url_for('auth.login') }}" class="text-teal fw-semibold">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

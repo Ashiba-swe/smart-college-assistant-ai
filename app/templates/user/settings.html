@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Smart College Assistant AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-saas p-4 p-md-5 border mb-4">
+                <h3 class="fw-bold text-dark mb-1">
+                    <i class="bi bi-gear text-teal me-2"></i> System & AI Provider Configuration
+                </h3>
+                <p class="text-muted small mb-4">Manage environment connections and language model parameters.</p>
+
+                <!-- AI Provider Status -->
+                <div class="p-3 rounded-3 bg-light border mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-dark"><i class="bi bi-cpu text-teal me-1"></i> Active AI Provider</span>
+                        <span class="badge bg-secondary">Google Gemini 2.5 Flash</span>
+                    </div>
+                    <p class="text-muted small mb-2">
+                        Retrieval-Augmented Generation processes documents through ChromaDB vector search and uses Gemini for natural language synthesis.
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <span class="small me-2">API Key Status:</span>
+                        {% if gemini_configured %}
+                            <span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-check2"></i> Configured in Environment</span>
+                        {% else %}
+                            <span class="badge bg-warning-subtle text-dark border border-warning"><i class="bi bi-info-circle"></i> Direct Fallback Knowledge Active (Add GEMINI_API_KEY in .env)</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Setup Instructions -->
+                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-key-fill text-warning me-1"></i> How to Configure Gemini API Key:</h6>
+                <div class="bg-dark text-white p-3 rounded-3 small font-monospace mb-4">
+                    <span class="text-secondary"># In your .env file or Render environment variables:</span><br>
+                    <span class="text-info">GEMINI_API_KEY</span>=<span class="text-warning">your-gemini-api-key-here</span><br>
+                    <span class="text-info">GEMINI_MODEL</span>=<span class="text-warning">gemini-2.5-flash</span>
+                </div>
+
+                <!-- Vector Storage Persistence Info -->
+                <div class="p-3 bg-light rounded-3 border">
+                    <div class="fw-bold small text-dark mb-1"><i class="bi bi-hdd-network text-primary me-1"></i> Persistent Vector Storage</div>
+                    <p class="text-muted small mb-0">
+                        ChromaDB vector embeddings are persisted to disk. On production environments like Render, mount a persistent disk or cloud vector store to retain uploaded documents across container restarts.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

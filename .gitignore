@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.cert
+
+# Database & Vector Store local state
+instance/*.db
+instance/*.sqlite
+instance/chroma_db/
+instance/chroma_db_test/
+*.db
+*.sqlite3
+
+# Uploaded dynamic files (keep directory structure)
+data/uploads/*
+!data/uploads/.gitkeep
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# OS specific
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Nn]otebooks/.ipynb_checkpoints
+.idea/
+.vscode/
+*.swp

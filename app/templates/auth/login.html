@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - Smart College Assistant AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card card-saas p-4 p-md-5 border">
+                <div class="text-center mb-4">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo" width="48" height="48" class="mb-2">
+                    <h3 class="fw-bold text-dark">Welcome Back</h3>
+                    <p class="text-muted small">Access your college assistant portal</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Username or Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                            <input type="text" name="identifier" id="login-identifier" class="form-control border-start-0" placeholder="student_ashiba or admin" value="{{ identifier or '' }}" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                            <input type="password" name="password" id="login-password" class="form-control border-start-0" placeholder="Enter your password" required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
+                            <label class="form-check-label small text-muted" for="rememberMe">Remember me</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-teal w-100 py-2 mb-3 shadow-sm">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                    </button>
+                </form>
+
+                <div class="text-center pt-2 border-top">
+                    <p class="small text-muted mb-0">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-teal fw-semibold">Register here</a></p>
+                </div>
+
+                <!-- One-click Demo Credentials Helper -->
+                <div class="mt-4 p-3 bg-light rounded-3 border">
+                    <div class="fw-semibold small text-dark mb-2"><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Demo Logins:</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary btn-sm py-1 px-2" onclick="fillLogin('student_ashiba', 'StudentSecure@2026')">
+                            <i class="bi bi-mortarboard me-1"></i> Student
+                        </button>
+                        <button class="btn btn-outline-info btn-sm py-1 px-2" onclick="fillLogin('faculty_cse', 'FacultySecure@2026')">
+                            <i class="bi bi-person-workspace me-1"></i> Faculty
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="fillLogin('admin', 'AdminSecure@2026')">
+                            <i class="bi bi-shield-lock me-1"></i> Admin
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fillLogin(user, pass) {
+    document.getElementById('login-identifier').value = user;
+    document.getElementById('login-password').value = pass;
+}
+</script>
+{% endblock %}

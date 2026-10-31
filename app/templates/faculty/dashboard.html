@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Desk - Smart College Assistant AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Banner -->
+    <div class="card card-saas p-4 bg-navy text-white mb-4 border-0 shadow">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="badge bg-info text-dark mb-2 px-3 py-1 rounded-pill">Faculty Portal</div>
+                <h2 class="fw-bold text-white mb-1">{{ current_user.full_name }}</h2>
+                <p class="text-white-50 mb-0">
+                    Department of {{ current_user.department }} &bull; Staff ID: {{ current_user.roll_number or 'FAC-01' }}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{{ url_for('faculty.upload_document') }}" class="btn btn-teal btn-sm me-2">
+                    <i class="bi bi-cloud-arrow-up me-1"></i> Submit Notice
+                </a>
+                <a href="{{ url_for('faculty.submit_faq') }}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-patch-question me-1"></i> Submit FAQ
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card card-saas p-3 border">
+                <div class="d-flex align-items-center">
+                    <div class="stat-badge bg-primary-subtle text-primary me-3">
+                        <i class="bi bi-file-earmark-arrow-up"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ my_docs|length }}</h4>
+                        <div class="text-muted small">My Submissions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-saas p-3 border">
+                <div class="d-flex align-items-center">
+                    <div class="stat-badge bg-warning-subtle text-warning me-3">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ pending_docs }}</h4>
+                        <div class="text-muted small">Pending Approval</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-saas p-3 border">
+                <div class="d-flex align-items-center">
+                    <div class="stat-badge bg-success-subtle text-success me-3">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ approved_docs }}</h4>
+                        <div class="text-muted small">Indexed into Vector DB</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submitted Documents List -->
+    <div class="card card-saas border mb-4">
+        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-files text-teal me-2"></i> My Document Submissions</h5>
+            <a href="{{ url_for('faculty.upload_document') }}" class="btn btn-teal btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> New Document
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Title</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Chunks</th>
+                        <th>Submitted On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in my_docs %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-dark">{{ doc.title }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ doc.category }}</span></td>
+                            <td>{{ doc.file_type.upper() }}</td>
+                            <td>
+                                {% if doc.status == 'APPROVED' %}
+                                    <span class="badge bg-success-subtle text-success border border-success">Approved & Indexed</span>
+                                {% elif doc.status == 'PENDING' %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning">Pending Review</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger">Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ doc.chunk_count }}</td>
+                            <td class="text-muted small">{{ doc.created_at.strftime('%b %d, %Y') }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                You have not submitted any departmental notices yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Submitted FAQs List -->
+    <div class="card card-saas border">
+        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-patch-question text-teal me-2"></i> My Submitted FAQs</h5>
+            <a href="{{ url_for('faculty.submit_faq') }}" class="btn btn-outline-teal btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> New FAQ
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Question</th>
+                        <th>Answer Snippet</th>
+                        <th>Verification Status</th>
+                        <th>Submitted Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in my_faqs %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-dark">{{ f.question }}</td>
+                            <td class="text-muted small">{{ f.answer[:80] }}...</td>
+                            <td>
+                                {% if f.is_verified %}
+                                    <span class="badge bg-success-subtle text-success">Verified & Active in AI</span>
+                                {% else %}
+                                    <span class="badge bg-warning-subtle text-warning">Pending Review</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">{{ f.created_at.strftime('%b %d, %Y') }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                No FAQs submitted yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

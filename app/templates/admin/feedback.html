@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback & Adaptive Learning - Admin Console{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-arrow-repeat text-teal me-2"></i> Adaptive Knowledge Feedback Loop
+            </h2>
+            <p class="text-muted mb-0">
+                Review student-reported answers and missing topics. Convert verified corrections directly into active vector knowledge.
+            </p>
+        </div>
+    </div>
+
+    <!-- Feedback Notice Alert -->
+    <div class="alert alert-info border-0 shadow-sm mb-4">
+        <div class="d-flex align-items-start">
+            <i class="bi bi-info-circle-fill fs-5 me-3 text-info"></i>
+            <div>
+                <strong>Adaptive RAG Knowledge Improvement:</strong>
+                Approving corrections here instantly converts student reports into authoritative verified FAQs and indexes them into the active ChromaDB vector space. Future student queries will immediately retrieve these verified corrections.
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Reports Table -->
+    <div class="card card-saas border overflow-hidden">
+        <div class="card-header bg-white py-3 px-4">
+            <h5 class="fw-bold text-dark mb-0">Student Reports & Issue Queue</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Issue Type</th>
+                        <th>Student & Question</th>
+                        <th>Student Comments</th>
+                        <th>AI Response Snippet</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Resolution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fb in feedbacks %}
+                        <tr>
+                            <td class="ps-4">
+                                <span class="badge {% if fb.feedback_type == 'INCORRECT' %}bg-danger-subtle text-danger border border-danger{% elif fb.feedback_type == 'MISSING_INFO' %}bg-warning-subtle text-dark border border-warning{% elif fb.feedback_type == 'HELPFUL' %}bg-success-subtle text-success border border-success{% else %}bg-secondary-subtle text-secondary border{% endif %}">
+                                    {{ fb.feedback_type }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ fb.question_snippet }}</div>
+                                <div class="text-muted small">Reported by {{ fb.user_name }} &bull; {{ fb.created_at }}</div>
+                            </td>
+                            <td class="small text-secondary">{{ fb.comments or 'None provided' }}</td>
+                            <td class="small text-muted" style="max-width: 250px;">
+                                <div class="text-truncate">{{ fb.answer_snippet }}</div>
+                            </td>
+                            <td>
+                                {% if fb.status == 'RESOLVED' %}
+                                    <span class="badge bg-success-subtle text-success">Resolved (FAQ Indexed)</span>
+                                {% else %}
+                                    <span class="badge bg-warning-subtle text-warning">Pending Review</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                {% if fb.status != 'RESOLVED' %}
+                                    <button class="btn btn-teal btn-sm" onclick="openResolveModal('{{ fb.id }}', '{{ fb.question_snippet|escape }}', '{{ fb.comments|escape }}')">
+                                        <i class="bi bi-check-circle me-1"></i> Resolve as FAQ
+                                    </button>
+                                {% else %}
+                                    <span class="text-success small fw-semibold"><i class="bi bi-check2-all"></i> Active</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No student feedback or issue reports recorded yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Convert Feedback to Verified FAQ -->
+<div class="modal fade" id="resolveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content card-saas border-0">
+            <div class="modal-header bg-navy text-white">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-magic text-teal me-2"></i> Convert Report into Verified Vector Knowledge
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="resolveForm" method="POST">
+                <div class="modal-body p-4">
+                    <p class="small text-muted mb-3">
+                        Drafting an authoritative answer here will resolve the student's report and instantly add the knowledge chunk to ChromaDB.
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Question / Inquired Topic *</label>
+                        <input type="text" name="question" id="modal-question" class="form-control" required>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="Academic Regulations">Academic Regulations</option>
+                                <option value="Examinations">Examinations</option>
+                                <option value="Administrative Procedures" selected>Administrative Procedures</option>
+                                <option value="Student Services">Student Services</option>
+                                <option value="Hostel & Transport">Hostel & Transport</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Authoritative Verified Answer *</label>
+                        <textarea name="answer" id="modal-answer" class="form-control" rows="4" placeholder="Provide the verified, officially approved instructions..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-teal btn-sm">
+                        <i class="bi bi-cpu-fill me-1"></i> Approve, Index into Vector DB & Resolve
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openResolveModal(feedbackId, question, comments) {
+    document.getElementById('resolveForm').action = '/admin/feedback/' + feedbackId + '/convert-to-faq';
+    document.getElementById('modal-question').value = question;
+    document.getElementById('modal-answer').value = comments ? ('Correction based on review: ' + comments) : '';
+    new bootstrap.Modal(document.getElementById('resolveModal')).show();
+}
+</script>
+{% endblock %}

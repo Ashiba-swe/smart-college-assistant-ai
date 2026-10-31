@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Official Document Library{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-file-earmark-text text-teal me-2"></i> Official Document Library
+            </h2>
+            <p class="text-muted mb-0">
+                Authorized institutional documents indexed into the Smart College Assistant AI knowledge base.
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            {% if current_user.is_authenticated and current_user.role in ['FACULTY', 'ADMINISTRATOR'] %}
+                <a href="{{ url_for('faculty.upload_document') }}" class="btn btn-teal btn-sm">
+                    <i class="bi bi-cloud-arrow-up me-1"></i> Upload Document
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Category Filter Buttons -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <button class="btn btn-sm btn-outline-dark active filter-btn" data-category="all">All Documents ({{ documents|length }})</button>
+        {% for cat in categories %}
+            <button class="btn btn-sm btn-outline-secondary filter-btn" data-category="{{ cat }}">{{ cat }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- Documents Grid -->
+    <div class="row g-4" id="documents-grid">
+        {% for doc in documents %}
+            <div class="col-md-6 col-lg-4 doc-item" data-category="{{ doc.category }}">
+                <div class="card card-saas h-100 p-4 border">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge {% if doc.file_type == 'PDF' %}bg-danger-subtle text-danger border border-danger-subtle{% elif doc.file_type == 'DOCX' %}bg-primary-subtle text-primary border border-primary-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %} px-2 py-1">
+                            {{ doc.file_type }}
+                        </span>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                            <i class="bi bi-check2-circle me-1"></i> Approved
+                        </span>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">{{ doc.title }}</h5>
+                    <div class="text-muted small mb-3">
+                        <i class="bi bi-folder me-1"></i> {{ doc.category }} &bull; {{ doc.department }}
+                    </div>
+                    <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center text-muted small">
+                        <span><i class="bi bi-grid-3x3 me-1"></i> {{ doc.chunk_count }} Chunks</span>
+                        <span><i class="bi bi-hdd me-1"></i> {{ doc.file_size_kb }} KB</span>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+                <h5 class="text-muted">No approved documents in the library yet.</h5>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'btn-outline-dark'));
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.add('btn-outline-secondary'));
+        this.classList.add('active', 'btn-outline-dark');
+        this.classList.remove('btn-outline-secondary');
+
+        const cat = this.getAttribute('data-category');
+        document.querySelectorAll('.doc-item').forEach(item => {
+            if (cat === 'all' || item.getAttribute('data-category') === cat) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
