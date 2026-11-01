@@ -1,17 +1,15 @@
+version: "1"
+
 services:
   # Web Application Service
   - type: web
     name: smart-college-assistant-ai
-    env: python
+    runtime: python
     region: oregon
     plan: free
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python scripts/seed_database.py
     startCommand: gunicorn "app:create_app('production')" --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     healthCheckPath: /health
-    disk:
-      name: college-data
-      mountPath: /data
-      sizeGB: 1
     envVars:
       - key: FLASK_ENV
         value: production
@@ -28,9 +26,9 @@ services:
           name: smart-college-db
           property: connectionString
       - key: CHROMA_PERSIST_DIR
-        value: /data/chroma_db
+        value: instance/chroma_db
       - key: UPLOAD_FOLDER
-        value: /data/uploads
+        value: data/uploads
 
 # Managed PostgreSQL Database
 databases:
